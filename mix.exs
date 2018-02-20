@@ -51,6 +51,7 @@ defmodule SSE.MixProject do
     [
       {:event_bus, ">= 1.0.0"},
       {:plug, "~> 1.4.4"},
+      {:ex_doc, ">= 0.0.0", only: :dev},
       {:dialyxir, "~> 0.5.1", only: :dev, runtime: false},
       {:excoveralls, "~> 0.8", only: :test},
     ]
