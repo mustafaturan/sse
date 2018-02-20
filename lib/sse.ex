@@ -15,7 +15,7 @@ defmodule SSE do
   @doc """
   Serv the SSE stream
   """
-  @spec stream(Plug.Conn.t(), tuple()) :: no_return()
+  @spec stream(Plug.Conn.t(), tuple()) :: Plug.Conn.t()
   defdelegate stream(conn, data),
     to: Server,
     as: :stream

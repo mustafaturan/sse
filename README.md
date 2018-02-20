@@ -18,7 +18,7 @@ Server-Sent Events (SSE) is a lightweight and standardized protocol for pushing 
 
 - [Phoenix Framework](#phoenix-framework)
 
-- [Standalone](#standalone-with-plug-without-any-framework)
+- [Standalone](#standalone-with-plug-withwithout-any-framework)
 
 [Docs](#docs)
 
@@ -38,7 +38,7 @@ def deps do
 end
 ```
 
-## Data Structure
+## Data Structures
 
 To send chunks of events to client you need to create a `SSE.Chunk` data structure and Event data structure to deliver events.
 
@@ -110,10 +110,10 @@ defmodule ExchangeRateController do
 
   # Sample action to display USD to EUR exchange price
   def show(conn, _params) do
-    rates = %{rates: Price.fetch()}
+    rates = %{rates: Ticker.fetch()}
     chunk = %Chunk(data: Poison.encode!(rates))
 
-    Server.stream(conn, {@topic, chunk})
+    SSE.stream(conn, {@topic, chunk})
   end
 
   ...
@@ -135,6 +135,10 @@ defmodule Ticker do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
+  def fetch do
+    GenServer.call(__MODULE__, {:fetch})
+  end
+
   def init(_) do
     # Let's update the price info every second
     update_exchange_rates_later()
@@ -152,6 +156,10 @@ defmodule Ticker do
 
     update_exchange_rates_later()
     {:noreply, new_rates}
+  end
+
+  def handle_call({:fetch}, _from, state) do
+    {:reply, state, state}
   end
 
   defp fetch_rates do
@@ -180,12 +188,12 @@ defmodule ExchangeRateController do
   ...
 
   get "/exchange_rates/usd_eur" do
-    rates = %{rates: Price.fetch()}
+    rates = %{rates: Ticker.fetch()}
     chunk = %Chunk(data: Poison.encode!(rates))
 
     conn
     |> Conn.put_resp_header("Access-Control-Allow-Origin", "*")
-    |> Server.stream({@topic, chunk})
+    |> SSE.stream({@topic, chunk})
   end
 
   ...
