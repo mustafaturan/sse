@@ -55,8 +55,8 @@ defmodule SSE.ServerTest do
     event = %EventBus.Model.Event{id: 1, data: chunk, topic: @topic}
     EventBus.notify(event)
 
-    Process.send_after(pid, {:close}, 1000)
-    Process.sleep(1000)
+    Process.sleep(3000)
+    Process.send_after(pid, {:close}, 6000)
 
     assert_received {:trace, ^pid, :receive, {:sse, :test_sse_sent, _}}
     assert_received {:trace, ^event_watcher_id, :receive,
