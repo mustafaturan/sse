@@ -1,5 +1,7 @@
 # SSE
 
+[![Build Status](https://travis-ci.org/mustafaturan/sse.svg?branch=master)](https://travis-ci.org/mustafaturan/sse)
+
 Server Sent Events for Elixir/Plug.
 
 Server-Sent Events (SSE) is a lightweight and standardized protocol for pushing notifications from a HTTP server to a client. In contrast to WebSocket, which offers bi-directional communication, SSE only allows for one-way communication from the server to the client. If that’s all you need, SSE has the advantages to be much simpler, to rely on HTTP 1.1 only and to offer retry semantics on broken connections by the browser.
