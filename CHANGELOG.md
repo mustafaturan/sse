@@ -14,3 +14,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Init for open source
 - Allow multiple topic subscriptions
+- Add travis badge
