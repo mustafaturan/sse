@@ -108,12 +108,12 @@ defmodule ExchangeRateController do
 
   ...
 
-  # Sample action to display USD to EUR exchange price
+  # Sample action to display USD to EUR exchange rates
   def show(conn, _params) do
     rates = %{rates: Ticker.fetch()}
     chunk = %Chunk(data: Poison.encode!(rates))
 
-    SSE.stream(conn, {@topic, chunk})
+    SSE.stream(conn, {[@topic], chunk})
   end
 
   ...
@@ -140,9 +140,9 @@ defmodule Ticker do
   end
 
   def init(_) do
-    # Let's update the price info every second
+    # Let's update the rates info every second
     update_exchange_rates_later()
-    {:ok, fetch_price()}
+    {:ok, fetch_rates()}
   end
 
   def handle_info(:update_exchange_rates, state) do
@@ -193,7 +193,7 @@ defmodule ExchangeRateController do
 
     conn
     |> Conn.put_resp_header("Access-Control-Allow-Origin", "*")
-    |> SSE.stream({@topic, chunk})
+    |> SSE.stream({[@topic], chunk})
   end
 
   ...
