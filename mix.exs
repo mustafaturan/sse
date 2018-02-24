@@ -49,7 +49,7 @@ defmodule SSE.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:event_bus, ">= 1.0.0"},
+      {:event_bus, ">= 1.2.0"},
       {:plug, "~> 1.4.4"},
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:dialyxir, "~> 0.5.1", only: :dev, runtime: false},

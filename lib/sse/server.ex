@@ -10,10 +10,10 @@ defmodule SSE.Server do
   @doc """
   Serv the SSE stream
   """
-  @spec stream(Conn.t(), {atom(), Chunk.t()}) :: Conn.t()
-  def stream(conn, {topic, %Chunk{} = chunk}) do
+  @spec stream(Conn.t(), {atom() | list(atom()), Chunk.t()}) :: Conn.t()
+  def stream(conn, {topics, %Chunk{} = chunk}) do
     {:ok, conn} = init_sse(conn, chunk)
-    {:ok, listener} = subscribe_sse(topic)
+    {:ok, listener} = subscribe_sse(topics)
     reset_timeout()
     listen_sse(conn, listener)
   end
@@ -70,9 +70,15 @@ defmodule SSE.Server do
 
   # Subscribe process to EventBus events for SSE chunks
   @spec subscribe_sse(atom()) :: {:ok, {SSE, map()}}
-  defp subscribe_sse(topic) do
+  defp subscribe_sse(topic) when is_atom(topic) do
+    subscribe_sse([topic])
+  end
+
+  @spec subscribe_sse(list(atom())) :: {:ok, {SSE, map()}}
+  defp subscribe_sse(topics) when is_list(topics) do
     listener = {SSE, %{pid: self()}}
-    {EventBus.subscribe({listener, ["^#{topic}$"]}), listener}
+    topics = Enum.map(topics, fn topic -> "^#{topic}$" end)
+    {EventBus.subscribe({listener, topics}), listener}
   end
 
   # Unsubscribe process from EventBus events
