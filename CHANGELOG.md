@@ -13,3 +13,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [0.1.X] - 2018.02.19
 
 - Init for open source
+- Allow multiple topic subscriptions
+- Add travis badge

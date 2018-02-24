@@ -1,5 +1,7 @@
 # SSE
 
+[![Build Status](https://travis-ci.org/mustafaturan/sse.svg?branch=master)](https://travis-ci.org/mustafaturan/sse)
+
 Server Sent Events for Elixir/Plug.
 
 Server-Sent Events (SSE) is a lightweight and standardized protocol for pushing notifications from a HTTP server to a client. In contrast to WebSocket, which offers bi-directional communication, SSE only allows for one-way communication from the server to the client. If that’s all you need, SSE has the advantages to be much simpler, to rely on HTTP 1.1 only and to offer retry semantics on broken connections by the browser.
@@ -108,12 +110,12 @@ defmodule ExchangeRateController do
 
   ...
 
-  # Sample action to display USD to EUR exchange price
+  # Sample action to display USD to EUR exchange rates
   def show(conn, _params) do
     rates = %{rates: Ticker.fetch()}
     chunk = %Chunk(data: Poison.encode!(rates))
 
-    SSE.stream(conn, {@topic, chunk})
+    SSE.stream(conn, {[@topic], chunk})
   end
 
   ...
@@ -140,9 +142,9 @@ defmodule Ticker do
   end
 
   def init(_) do
-    # Let's update the price info every second
+    # Let's update the rates info every second
     update_exchange_rates_later()
-    {:ok, fetch_price()}
+    {:ok, fetch_rates()}
   end
 
   def handle_info(:update_exchange_rates, state) do
@@ -193,7 +195,7 @@ defmodule ExchangeRateController do
 
     conn
     |> Conn.put_resp_header("Access-Control-Allow-Origin", "*")
-    |> SSE.stream({@topic, chunk})
+    |> SSE.stream({[@topic], chunk})
   end
 
   ...
