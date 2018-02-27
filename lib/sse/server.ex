@@ -56,7 +56,7 @@ defmodule SSE.Server do
         send_sse(conn, event.data, listener)
 
       {:send_iddle} ->
-        send_sse(conn, %Chunk{data: []}, listener)
+        send_sse(conn, keep_alive_chunk(), listener)
 
       {:close} ->
         unsubscribe_sse(listener)
@@ -94,5 +94,11 @@ defmodule SSE.Server do
     new_ref = Process.send_after(self(), {:send_iddle}, Config.keep_alive())
     old_ref = Process.put(:timer_ref, new_ref)
     unless is_nil(old_ref), do: Process.cancel_timer(old_ref)
+  end
+
+  # Keep alive Chunk struct
+  @spec keep_alive_chunk() :: Chunk.t()
+  defp keep_alive_chunk do
+    %Chunk{comment: "KA", data: []}
   end
 end
