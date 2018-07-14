@@ -21,7 +21,7 @@ defmodule SSE.Server do
   # Init SSE connection
   @spec init_sse(Conn.t(), Chunk.t()) :: Conn.t()
   defp init_sse(conn, %Chunk{} = chunk) do
-    Logger.info("SSE connection opened!")
+    Logger.info("SSE connection (#{inspect(self())}) opened!")
 
     conn
     |> Conn.put_resp_content_type("text/event-stream")
@@ -83,8 +83,8 @@ defmodule SSE.Server do
 
   # Unsubscribe process from EventBus events
   @spec unsubscribe_sse(tuple()) :: :ok
-  defp unsubscribe_sse(listener) do
-    Logger.info("SSE connection closed!")
+  defp unsubscribe_sse({_, %{pid: pid}} = listener) do
+    Logger.info("SSE connection (#{inspect(pid)}) closed!")
     EventBus.unsubscribe(listener)
   end
 
