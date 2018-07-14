@@ -51,9 +51,9 @@ defmodule SSE.Server do
   defp listen_sse(conn, listener) do
     receive do
       {:sse, topic, id} ->
-        event = EventBus.fetch_event({topic, id})
+        data = EventBus.fetch_event_data({topic, id})
         EventBus.mark_as_completed({listener, topic, id})
-        send_sse(conn, event.data, listener)
+        send_sse(conn, data, listener)
 
       {:send_iddle} ->
         send_sse(conn, keep_alive_chunk(), listener)
