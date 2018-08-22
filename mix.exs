@@ -9,11 +9,10 @@ defmodule SSE.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
-      start_permanent: Mix.env() == :prod,
       description: description(),
       package: package(),
       deps: deps(),
-      docs: [extras: ["README.md"]],
+      docs: [extras: ~w(README.md)],
       test_coverage: [tool: ExCoveralls],
       dialyzer: [plt_add_deps: :transitive]
     ]
@@ -27,8 +26,13 @@ defmodule SSE.MixProject do
     ]
   end
 
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_), do: ["lib"]
+  defp elixirc_paths(:test) do
+    ~w(lib test/support)
+  end
+
+  defp elixirc_paths(_) do
+    ~w(lib)
+  end
 
   defp description do
     """
@@ -39,9 +43,9 @@ defmodule SSE.MixProject do
   defp package do
     [
       name: :sse,
-      files: ["lib", "mix.exs", "README.md"],
+      files: ~w(lib mix.exs README.md),
       maintainers: ["Mustafa Turan"],
-      licenses: ["MIT"],
+      licenses: ~w(MIT),
       links: %{"GitHub" => "https://github.com/mustafaturan/sse"}
     ]
   end
@@ -49,8 +53,9 @@ defmodule SSE.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:event_bus, ">= 1.3.7"},
+      {:event_bus, ">= 1.4.1"},
       {:plug, ">= 1.4.5"},
+      {:credo, "~> 0.10.0", only: :dev},
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:dialyxir, "~> 0.5.1", only: :dev, runtime: false},
       {:excoveralls, "~> 0.8", only: :test},

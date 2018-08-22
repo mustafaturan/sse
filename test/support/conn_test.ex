@@ -17,7 +17,7 @@ defmodule SSE.ConnTest do
   Creates a connection to be used in upcoming requests.
   """
   @spec build_conn() :: Conn.t()
-  def build_conn() do
+  def build_conn do
     build_conn(:get, "/", nil)
   end
 
@@ -29,7 +29,8 @@ defmodule SSE.ConnTest do
   """
   @spec build_conn(atom | binary, binary, binary | list | map) :: Conn.t()
   def build_conn(method, path, params_or_body \\ nil) do
-    Plug.Adapters.Test.Conn.conn(%Conn{}, method, path, params_or_body)
+    %Conn{}
+    |> Plug.Adapters.Test.Conn.conn(method, path, params_or_body)
     |> Conn.put_private(:plug_skip_csrf_protection, true)
   end
 end
