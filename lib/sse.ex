@@ -8,6 +8,7 @@ defmodule SSE do
   @doc """
   Deliver EventBus SSE events to the given process
   """
+  @spec process({Map.t(), atom(), integer() | binary()}) :: no_return()
   def process({%{pid: pid}, topic, id}) do
     send(pid, {:sse, topic, id})
   end

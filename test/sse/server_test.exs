@@ -2,7 +2,11 @@ defmodule SSE.ServerTest do
   use ExUnit.Case, async: false
   use Plug.Test
   use SSE.ConnCase
-  alias SSE.{Chunk, Server}
+
+  alias EventBus.Manager.Observation, as: ObservationManager
+  alias EventBus.Model.Event
+  alias SSE.{Chunk, ConnTest, Server}
+
   require Logger
 
   doctest SSE
@@ -11,7 +15,7 @@ defmodule SSE.ServerTest do
 
   setup do
     Application.put_env(:sse, :keep_alive, "250")
-    {:ok, conn: SSE.ConnTest.build_conn()}
+    {:ok, conn: ConnTest.build_conn()}
   end
 
   test "stream", %{conn: conn} do
@@ -41,23 +45,21 @@ defmodule SSE.ServerTest do
     :erlang.trace(pid, true, [:receive])
     send(pid, {:close})
 
-    assert_received {:trace, ^pid, :receive, {:close}}
+    assert_receive {:trace, ^pid, :receive, {:close}}
   end
-
 
   test "stream and send_iddle to keep alive", %{conn: conn} do
     pid = spawn(fn -> stream_chunk(conn) end)
     :erlang.trace(pid, true, [:receive])
 
     Process.sleep(300)
-    send(pid, {:close})
 
     assert_receive {:trace, ^pid, :receive, {:send_iddle}}
   end
 
   test "stream and send a new event chunk", %{conn: conn} do
     pid = spawn(fn -> stream_chunk(conn) end)
-    event_watcher_id = Process.whereis EventBus.Manager.Observation
+    event_watcher_id = Process.whereis(ObservationManager)
 
     :erlang.trace(pid, true, [:receive])
     :erlang.trace(event_watcher_id, true, [:receive])
@@ -65,7 +67,7 @@ defmodule SSE.ServerTest do
     Process.sleep(1000)
 
     chunk = %Chunk{data: "Hi again!"}
-    event = %EventBus.Model.Event{id: 1, data: chunk, topic: @topic}
+    event = %Event{id: 1, data: chunk, topic: @topic}
     EventBus.notify(event)
 
     Process.send_after(pid, {:close}, 3000)
