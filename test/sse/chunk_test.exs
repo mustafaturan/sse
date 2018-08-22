@@ -9,7 +9,7 @@ defmodule SSE.ChunkTest do
     id = "123456"
     event = "message"
     data = ["one line"]
-    retry = 15000
+    retry = 15_000
 
     chunk =
       %Chunk{
@@ -33,7 +33,7 @@ defmodule SSE.ChunkTest do
     second = "second line"
     third = "third line"
     data = [first, second, third]
-    retry = 15000
+    retry = 15_000
 
     chunk =
       %Chunk{
@@ -54,7 +54,7 @@ defmodule SSE.ChunkTest do
     id = "123456"
     event = "message"
     data = nil
-    retry = 15000
+    retry = 15_000
 
     chunk =
       %Chunk{

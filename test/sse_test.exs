@@ -4,7 +4,7 @@ defmodule SSETest do
 
   test "process" do
     topic = :test_event_sent
-    id = 123456
+    id = 123
 
     SSE.process({%{pid: self()}, topic, id})
 

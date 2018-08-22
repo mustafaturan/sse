@@ -5,6 +5,7 @@ defmodule SSE.Server do
 
   alias Plug.Conn
   alias SSE.{Chunk, Config}
+
   require Logger
 
   @doc """
