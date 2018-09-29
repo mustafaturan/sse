@@ -1,7 +1,6 @@
 defmodule SSE.Config do
-  @moduledoc """
-  Config vars
-  """
+  @moduledoc false
+  # Config vars
 
   @app :sse
 

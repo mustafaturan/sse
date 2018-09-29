@@ -35,10 +35,13 @@ The package can be installed by adding `sse` to your list of dependencies in `mi
 ```elixir
 def deps do
   [
-    {:sse, "~> 0.1"}
+    {:sse, "~> 0.1"},
+    {:evet_bus, ">= 1.5.2"}
   ]
 end
 ```
+
+**Note:** It is highly recommended to use latest version of `event_bus` library. Please make sure that `event_bus` app starts earlier than `sse` library.
 
 ## Data Structures
 
