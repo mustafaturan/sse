@@ -29,14 +29,14 @@ defmodule SSE.Chunk do
   If a non-integer value is specified the field is ignored.
   """
   @type t :: %__MODULE__{
-          comment: binary(),
-          data: list(binary()),
-          event: binary(),
-          id: binary(),
-          retry: integer()
+          comment: nil | String.t(),
+          data: nil | list(String.t()),
+          event: nil | String.t(),
+          id: nil | String.t(),
+          retry: nil | integer()
         }
 
-  @spec build(__MODULE__.t()) :: String.t()
+  @spec build(t()) :: String.t()
   def build(%__MODULE__{
         comment: comment,
         data: data,
@@ -54,14 +54,14 @@ defmodule SSE.Chunk do
     raise("Chunk data can't be blank!")
   end
 
-  @spec build_data(list(binary())) :: String.t()
+  @spec build_data(list(String.t())) :: String.t()
   defp build_data(data_list) when is_list(data_list) do
     Enum.reduce(data_list, "", fn(data, acc) ->
       acc <> "data: #{data}\n"
     end)
   end
 
-  @spec build_data(binary()) :: String.t()
+  @spec build_data(String.t()) :: String.t()
   defp build_data(data) do
     "data: #{data}\n"
   end
@@ -71,7 +71,7 @@ defmodule SSE.Chunk do
     ""
   end
 
-  @spec build_field(String.t(), binary()) :: String.t()
+  @spec build_field(String.t(), String.t()) :: String.t()
   defp build_field(field, value) do
     "#{field}: #{value}\n"
   end

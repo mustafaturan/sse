@@ -4,7 +4,7 @@ defmodule SSE.MixProject do
   def project do
     [
       app: :sse,
-      version: "0.1.5",
+      version: "0.1.6",
       elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env()),
       build_embedded: Mix.env() == :prod,
@@ -53,12 +53,12 @@ defmodule SSE.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:event_bus, ">= 1.4.1"},
+      {:event_bus, ">= 1.5.2"},
       {:plug, ">= 1.4.5"},
-      {:credo, "~> 0.10.0", only: :dev},
+      {:credo, "~> 0.10.2", only: :dev},
       {:ex_doc, ">= 0.0.0", only: :dev},
-      {:dialyxir, "~> 0.5.1", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.8", only: :test},
+      {:dialyxir, "~> 1.0.0-rc.3", only: :dev, runtime: false},
+      {:excoveralls, "~> 0.10.1", only: :test},
     ]
   end
 end
