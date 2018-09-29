@@ -1,18 +1,26 @@
 defmodule SSE.Server do
-  @moduledoc """
-  Server for SSE
-  """
+  @moduledoc false
+  # Server for SSE
 
   alias Plug.Conn
   alias SSE.{Chunk, Config}
 
   require Logger
 
+  @type chunk :: Chunk.t()
+  @type chunk_conn :: {:ok, conn()} | {:error, term()}
+  @type conn :: Conn.t()
+  @type listener_with_config :: {module(), map()}
+  @type topic :: atom()
+  @type topic_or_topics :: topic() | topics()
+  @type topics :: list(topic())
+  @type topics_with_chunk :: {topic_or_topics(), chunk()}
+
   @doc """
   Serv the SSE stream
   """
-  @spec stream(Conn.t(), {atom() | list(atom()), Chunk.t()}) :: Conn.t()
-  def stream(conn, {topics, %Chunk{} = chunk}) do
+  @spec stream(conn(), topics_with_chunk()) :: conn()
+  def stream(conn, {topics, %Chunk{} = chunk} = _topics_with_chunk) do
     {:ok, conn} = init_sse(conn, chunk)
     {:ok, listener} = subscribe_sse(topics)
     reset_timeout()
@@ -20,8 +28,8 @@ defmodule SSE.Server do
   end
 
   # Init SSE connection
-  @spec init_sse(Conn.t(), Chunk.t()) :: Conn.t()
-  defp init_sse(conn, %Chunk{} = chunk) do
+  @spec init_sse(conn(), chunk()) :: chunk_conn()
+  defp init_sse(conn, chunk) do
     Logger.info("SSE connection (#{inspect(self())}) opened!")
 
     conn
@@ -31,8 +39,8 @@ defmodule SSE.Server do
   end
 
   # Send new SSE chunk
-  @spec send_sse(Conn.t(), Chunk.t(), tuple()) :: Conn.t() | no_return()
-  defp send_sse(conn, %Chunk{} = chunk, listener) do
+  @spec send_sse(conn(), chunk(), listener_with_config()) :: conn()
+  defp send_sse(conn, chunk, listener) do
     case Conn.chunk(conn, Chunk.build(chunk)) do
       {:ok, conn} ->
         reset_timeout()
@@ -41,14 +49,11 @@ defmodule SSE.Server do
       {:error, _reason} ->
         unsubscribe_sse(listener)
         conn
-
-      _ ->
-        conn
     end
   end
 
   # Listen EventBus events for SSE chunks
-  @spec listen_sse(Conn.t(), tuple()) :: Conn.t()
+  @spec listen_sse(conn(), listener_with_config()) :: conn()
   defp listen_sse(conn, listener) do
     receive do
       {:sse, topic, id} ->
@@ -70,12 +75,12 @@ defmodule SSE.Server do
   end
 
   # Subscribe process to EventBus events for SSE chunks
-  @spec subscribe_sse(atom()) :: {:ok, {SSE, map()}}
+  @spec subscribe_sse(topic()) :: {:ok, {SSE, map()}}
   defp subscribe_sse(topic) when is_atom(topic) do
     subscribe_sse([topic])
   end
 
-  @spec subscribe_sse(list(atom())) :: {:ok, {SSE, map()}}
+  @spec subscribe_sse(topics()) :: {:ok, {SSE, map()}}
   defp subscribe_sse(topics) when is_list(topics) do
     listener = {SSE, %{pid: self()}}
     topics = Enum.map(topics, fn topic -> "^#{topic}$" end)
@@ -83,22 +88,23 @@ defmodule SSE.Server do
   end
 
   # Unsubscribe process from EventBus events
-  @spec unsubscribe_sse(tuple()) :: :ok
+  @spec unsubscribe_sse(listener_with_config()) :: :ok
   defp unsubscribe_sse({_, %{pid: pid}} = listener) do
     Logger.info("SSE connection (#{inspect(pid)}) closed!")
     EventBus.unsubscribe(listener)
   end
 
   # Reset iddle timer
-  @spec reset_timeout() :: no_return()
+  @spec reset_timeout() :: :ok
   defp reset_timeout do
     new_ref = Process.send_after(self(), {:send_iddle}, Config.keep_alive())
     old_ref = Process.put(:timer_ref, new_ref)
     unless is_nil(old_ref), do: Process.cancel_timer(old_ref)
+    :ok
   end
 
   # Keep alive Chunk struct
-  @spec keep_alive_chunk() :: Chunk.t()
+  @spec keep_alive_chunk() :: chunk()
   defp keep_alive_chunk do
     %Chunk{comment: "KA", data: []}
   end
