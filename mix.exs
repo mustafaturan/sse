@@ -4,7 +4,7 @@ defmodule SSE.MixProject do
   def project do
     [
       app: :sse,
-      version: "0.1.6",
+      version: "0.2.0",
       elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env()),
       build_embedded: Mix.env() == :prod,
