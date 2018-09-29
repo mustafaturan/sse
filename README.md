@@ -35,7 +35,7 @@ The package can be installed by adding `sse` to your list of dependencies in `mi
 ```elixir
 def deps do
   [
-    {:sse, "~> 0.1"},
+    {:sse, "~> 0.2"},
     {:evet_bus, ">= 1.5.2"}
   ]
 end
