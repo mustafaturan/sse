@@ -29,11 +29,11 @@ defmodule SSE.Chunk do
   If a non-integer value is specified the field is ignored.
   """
   @type t :: %__MODULE__{
-          comment: nil | String.t(),
-          data: nil | list(String.t()),
-          event: nil | String.t(),
-          id: nil | String.t(),
-          retry: nil | integer()
+          comment: String.t() | nil,
+          data: list(String.t()),
+          event: String.t() | nil,
+          id: String.t() | nil,
+          retry: integer() | nil
         }
 
   @spec build(t()) :: String.t()
@@ -71,7 +71,7 @@ defmodule SSE.Chunk do
     ""
   end
 
-  @spec build_field(String.t(), String.t()) :: String.t()
+  @spec build_field(String.t(), String.t() | integer()) :: String.t()
   defp build_field(field, value) do
     "#{field}: #{value}\n"
   end
