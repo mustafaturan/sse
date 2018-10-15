@@ -53,7 +53,7 @@ defmodule SSE.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:event_bus, ">= 1.5.2"},
+      {:event_bus, ">= 1.6.0"},
       {:plug, ">= 1.4.5"},
       {:credo, "~> 0.10.2", only: :dev},
       {:ex_doc, ">= 0.0.0", only: :dev},
