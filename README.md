@@ -36,7 +36,7 @@ The package can be installed by adding `sse` to your list of dependencies in `mi
 def deps do
   [
     {:sse, "~> 0.2"},
-    {:evet_bus, ">= 1.6.0"}
+    {:event_bus, ">= 1.6.0"}
   ]
 end
 ```
