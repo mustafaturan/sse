@@ -194,7 +194,7 @@ defmodule ExchangeRateController do
 
   get "/exchange_rates/usd_eur" do
     rates = %{rates: Ticker.fetch()}
-    chunk = %Chunk(data: Poison.encode!(rates))
+    chunk = %Chunk{data: Poison.encode!(rates)}
 
     conn
     |> Conn.put_resp_header("Access-Control-Allow-Origin", "*")
