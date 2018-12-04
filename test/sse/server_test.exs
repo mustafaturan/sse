@@ -4,6 +4,7 @@ defmodule SSE.ServerTest do
   use SSE.ConnCase
 
   alias EventBus.Manager.Observation, as: ObservationManager
+  alias EventBus.Manager.Subscription, as: SubscriptionManager
   alias EventBus.Model.Event
   alias SSE.{Chunk, ConnTest, Server}
 
@@ -42,10 +43,16 @@ defmodule SSE.ServerTest do
 
   test "stream and close conn", %{conn: conn} do
     pid = spawn(fn -> stream_chunk(conn) end)
+    subscription_manager_pid = Process.whereis(SubscriptionManager)
+
     :erlang.trace(pid, true, [:receive])
+    :erlang.trace(subscription_manager_pid, true, [:receive])
+
     send(pid, {:close})
 
     assert_receive {:trace, ^pid, :receive, {:close}}
+    assert_receive {:trace, ^subscription_manager_pid, :receive,
+      {:"$gen_cast", {:unsubscribe, _}}}, 3000
   end
 
   test "stream and send_iddle to keep alive", %{conn: conn} do
@@ -57,12 +64,27 @@ defmodule SSE.ServerTest do
     assert_receive {:trace, ^pid, :receive, {:send_iddle}}
   end
 
-  test "stream and send a new event chunk", %{conn: conn} do
+  test "unsubscribe on close", %{conn: conn} do
+    self_pid = self()
     pid = spawn(fn -> stream_chunk(conn) end)
-    event_watcher_id = Process.whereis(ObservationManager)
+    subscription_manager_pid = Process.whereis(SubscriptionManager)
 
     :erlang.trace(pid, true, [:receive])
-    :erlang.trace(event_watcher_id, true, [:receive])
+    :erlang.trace(subscription_manager_pid, true, [:receive])
+
+    Process.send_after(pid, {:EXIT, self_pid, :kill}, 300)
+
+    assert_receive {:trace, ^pid, :receive, {:EXIT, ^self_pid, :kill}}, 3000
+    assert_receive {:trace, ^subscription_manager_pid, :receive,
+      {:"$gen_cast", {:unsubscribe, _}}}, 3000
+  end
+
+  test "stream and send a new event chunk", %{conn: conn} do
+    pid = spawn(fn -> stream_chunk(conn) end)
+    event_watcher_pid = Process.whereis(ObservationManager)
+
+    :erlang.trace(pid, true, [:receive])
+    :erlang.trace(event_watcher_pid, true, [:receive])
 
     Process.sleep(1000)
 
@@ -72,7 +94,7 @@ defmodule SSE.ServerTest do
 
     Process.send_after(pid, {:close}, 3000)
     assert_receive {:trace, ^pid, :receive, {:sse, :test_sse_sent, _}}, 3000
-    assert_receive {:trace, ^event_watcher_id, :receive,
+    assert_receive {:trace, ^event_watcher_pid, :receive,
       {:"$gen_cast", {:mark_as_completed, _}}}, 3000
   end
 

@@ -24,6 +24,7 @@ defmodule SSE.Server do
     {:ok, conn} = init_sse(conn, chunk)
     {:ok, listener} = subscribe_sse(topics)
     reset_timeout()
+    Process.flag(:trap_exit, true)
     listen_sse(conn, listener)
   end
 
@@ -66,6 +67,10 @@ defmodule SSE.Server do
 
       {:close} ->
         unsubscribe_sse(listener)
+
+      {:EXIT, _from, _reason} ->
+        unsubscribe_sse(listener)
+        Process.exit(self(), :normal)
 
       _ ->
         listen_sse(conn, listener)
