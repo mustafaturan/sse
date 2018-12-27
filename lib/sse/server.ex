@@ -11,6 +11,7 @@ defmodule SSE.Server do
   @type chunk_conn :: {:ok, conn()} | {:error, term()}
   @type conn :: Conn.t()
   @type listener_with_config :: {module(), map()}
+  @type matcher :: tuple()
   @type topic :: atom()
   @type topic_or_topics :: topic() | topics()
   @type topics :: list(topic())
@@ -19,10 +20,10 @@ defmodule SSE.Server do
   @doc """
   Serv the SSE stream
   """
-  @spec stream(conn(), topics_with_chunk()) :: conn()
-  def stream(conn, {topics, %Chunk{} = chunk} = _topics_with_chunk) do
+  @spec stream(conn(), topics_with_chunk(), matcher) :: conn()
+  def stream(conn, {topics, %Chunk{} = chunk} = _topics_with_chunk, matcher) do
     {:ok, conn} = init_sse(conn, chunk)
-    {:ok, listener} = subscribe_sse(topics)
+    {:ok, listener} = subscribe_sse(topics, matcher)
     reset_timeout()
     Process.flag(:trap_exit, true)
     listen_sse(conn, listener)
@@ -80,14 +81,14 @@ defmodule SSE.Server do
   end
 
   # Subscribe process to EventBus events for SSE chunks
-  @spec subscribe_sse(topic()) :: {:ok, {SSE, map()}}
-  defp subscribe_sse(topic) when is_atom(topic) do
-    subscribe_sse([topic])
+  @spec subscribe_sse(topic(), matcher()) :: {:ok, {SSE, map()}}
+  defp subscribe_sse(topic, matcher) when is_atom(topic) do
+    subscribe_sse([topic], matcher)
   end
 
-  @spec subscribe_sse(topics()) :: {:ok, {SSE, map()}}
-  defp subscribe_sse(topics) when is_list(topics) do
-    listener = {SSE, %{pid: self()}}
+  @spec subscribe_sse(topics(), matcher) :: {:ok, {SSE, map()}}
+  defp subscribe_sse(topics, {module, module_conf}) when is_list(topics) do
+    listener = {module, %{pid: self(), matcher: module_conf}}
     topics = Enum.map(topics, fn topic -> "^#{topic}$" end)
     {EventBus.subscribe({listener, topics}), listener}
   end

@@ -23,7 +23,7 @@ defmodule SSE.ServerTest do
     Process.send_after(self(), {:close}, 300)
 
     chunk = %Chunk{data: "Hi there!"}
-    conn = Server.stream(conn, {@topic, chunk})
+    conn = Server.stream(conn, {@topic, chunk}, {SSE, {}})
 
     refute is_nil(Process.get(:timer_ref))
     assert conn.state == :chunked
@@ -34,7 +34,7 @@ defmodule SSE.ServerTest do
     Process.send_after(self(), {:close}, 300)
 
     chunk = %Chunk{data: "Hi there!"}
-    conn = Server.stream(conn, {[@topic, :another_event_occured], chunk})
+    conn = Server.stream(conn, {[@topic, :another_event_occured], chunk}, {SSE, {}})
 
     refute is_nil(Process.get(:timer_ref))
     assert conn.state == :chunked
@@ -100,6 +100,6 @@ defmodule SSE.ServerTest do
 
   defp stream_chunk(conn) do
     chunk = %Chunk{data: "test sse event data"}
-    Server.stream(conn, {:test_sse_sent, chunk})
+    Server.stream(conn, {:test_sse_sent, chunk}, {SSE, {}})
   end
 end

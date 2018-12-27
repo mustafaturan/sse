@@ -10,6 +10,7 @@ defmodule SSE do
   @type conn :: Plug.Conn.t()
   @type event_id :: integer() | String.t()
   @type event_shadow_with_config :: {config(), topic(), event_id()}
+  @type matcher :: tuple()
   @type topic :: atom()
   @type topic_or_topics :: topic() | topics()
   @type topics :: list(topic())
@@ -26,8 +27,8 @@ defmodule SSE do
   @doc """
   Serv the SSE stream
   """
-  @spec stream(conn(), topics_with_chunk()) :: conn()
-  defdelegate stream(conn, data),
+  @spec stream(conn(), topics_with_chunk(), matcher()) :: conn()
+  defdelegate stream(conn, data, matcher \\ {SSE, {}}),
     to: Server,
     as: :stream
 end
