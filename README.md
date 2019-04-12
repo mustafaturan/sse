@@ -206,6 +206,54 @@ defmodule ExchangeRateController do
 end
 ```
 
+## Cowboy Dependency Notes
+
+If you are using cowboy >= `2.5.0` then you need to pass `:idle_timeout` option to cowboy server configuration to not to face timeouts after 60 seconds.
+
+Changes on cowboy: https://github.com/ninenines/cowboy/commit/a45813c60f0f983a24ea29d491b37f0590fdd087#diff-eb7ad6798a2ba75c9e305f8f55b87402R160
+
+Details: https://ninenines.eu/docs/en/cowboy/2.5/manual/cowboy_http/
+
+**Sample config Cowboy server config:**
+
+```elixir
+defmodule Web.Router do
+  use Plug.Router
+
+  plug(:match)
+  plug(:dispatch)
+
+  ...
+end
+
+defmodule Web.RouterSupervisor do
+  @moduledoc """
+  A server supervisor using Cowboy web server
+  """
+
+  use Supervisor
+
+  alias Plug.Adapters.Cowboy
+  alias Web.Router # Your router
+
+  @doc false
+  def init(opts) do
+    opts
+  end
+
+  @doc false
+  def start_link do
+    {:ok, _} = Cowboy.http(
+        Router,
+        [],
+        port: 4000,
+        compress: true,
+        protocol_options: [idle_timeout: :infinity]
+      )
+  end
+end
+```
+
 ## Docs
 
 The module docs can be found at [https://hexdocs.pm/sse](https://hexdocs.pm/sse).
