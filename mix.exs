@@ -55,7 +55,7 @@ defmodule SSE.MixProject do
     [
       {:event_bus, ">= 1.6.0"},
       {:plug, ">= 1.4.5"},
-      {:credo, "~> 1.2.1", only: :dev},
+      {:credo, "~> 1.3.1", only: :dev},
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:dialyxir, "~> 1.0.0-rc.4", only: :dev, runtime: false},
       {:excoveralls, "~> 0.12.0", only: :test},
