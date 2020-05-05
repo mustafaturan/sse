@@ -26,6 +26,8 @@ Server-Sent Events (SSE) is a lightweight and standardized protocol for pushing 
 
 [Contributing](#contributing)
 
+[Troubleshooting](#troubleshooting)
+
 [License](#license)
 
 ## Installation
@@ -271,6 +273,10 @@ Fork the project.
 Make your improvements and write your tests(make sure you covered all the cases).
 
 Make a pull request.
+
+## Troubleshooting
+
+While this is not widely known on the internet, browsers actually limit the number of connections per domain to 6. There's a good summary [on Stackoverflow](https://stackoverflow.com/questions/5195452/websockets-vs-server-sent-events-eventsource).
 
 ## License
 
