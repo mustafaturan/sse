@@ -58,7 +58,7 @@ defmodule SSE.MixProject do
       {:credo, "~> 1.5.1", only: :dev},
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:dialyxir, "~> 1.0.0-rc.4", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.13.0", only: :test},
+      {:excoveralls, "~> 0.14.2", only: :test},
     ]
   end
 end
